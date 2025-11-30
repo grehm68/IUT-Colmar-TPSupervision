@@ -1,0 +1,50 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0" version="29.1.0">
+  <diagram name="Page-1" id="qu7cZ-8AOJmiC94axgwS">
+    <mxGraphModel dx="2245" dy="786" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="3J0U-Gf9iPzIx-0JaLvC-17" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=3;" value="" vertex="1">
+          <mxGeometry height="380" width="580" x="-250" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="3J0U-Gf9iPzIx-0JaLvC-16" parent="1" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;align=right;spacingRight=-18;strokeWidth=3;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;b&gt;zbx_net&lt;/b&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="400" width="520" x="-250" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="3J0U-Gf9iPzIx-0JaLvC-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillWeight=4;hachureGap=8;hachureAngle=45;fillColor=#1ba1e2;sketch=1;" value="&lt;b style=&quot;&quot;&gt;&lt;font style=&quot;color: rgb(0, 0, 0); font-size: 16px; background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;zbx-postgres : 5432&lt;/font&gt;&lt;/b&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="-120" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="3J0U-Gf9iPzIx-0JaLvC-3" edge="1" parent="1" source="3J0U-Gf9iPzIx-0JaLvC-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="3J0U-Gf9iPzIx-0JaLvC-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3J0U-Gf9iPzIx-0JaLvC-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillWeight=4;hachureGap=8;hachureAngle=45;fillColor=#1ba1e2;sketch=1;" value="&lt;b style=&quot;&quot;&gt;&lt;font style=&quot;color: rgb(0, 0, 0); font-size: 16px; background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;zbx-server : 10051&lt;/font&gt;&lt;/b&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="-120" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="3J0U-Gf9iPzIx-0JaLvC-14" edge="1" parent="1" source="3J0U-Gf9iPzIx-0JaLvC-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="3J0U-Gf9iPzIx-0JaLvC-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3J0U-Gf9iPzIx-0JaLvC-15" edge="1" parent="1" source="3J0U-Gf9iPzIx-0JaLvC-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="3J0U-Gf9iPzIx-0JaLvC-1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="120" y="280" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3J0U-Gf9iPzIx-0JaLvC-5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillWeight=4;hachureGap=8;hachureAngle=45;fillColor=#1ba1e2;sketch=1;" value="&lt;b style=&quot;&quot;&gt;&lt;font style=&quot;color: rgb(0, 0, 0); font-size: 16px; background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;zbx-web : 8080&lt;/font&gt;&lt;/b&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="60" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="3J0U-Gf9iPzIx-0JaLvC-11" edge="1" parent="1" source="3J0U-Gf9iPzIx-0JaLvC-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="3J0U-Gf9iPzIx-0JaLvC-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3J0U-Gf9iPzIx-0JaLvC-8" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillWeight=4;hachureGap=8;hachureAngle=45;fillColor=#1ba1e2;sketch=1;" value="&lt;b style=&quot;&quot;&gt;&lt;font style=&quot;color: rgb(0, 0, 0); font-size: 16px; background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;zbx-agent2 : 10051&lt;/font&gt;&lt;/b&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="-120" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="3J0U-Gf9iPzIx-0JaLvC-19" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;b&gt;Docker&lt;/b&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="220" x="180" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="3J0U-Gf9iPzIx-0JaLvC-25" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=3;" value="&lt;h1&gt;OS&lt;/h1&gt;" vertex="1">
+          <mxGeometry height="60" width="670" x="-280" y="585" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
