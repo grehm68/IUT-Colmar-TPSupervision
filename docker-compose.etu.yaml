@@ -1,0 +1,109 @@
+
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: zbx-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-zabbix}
+      POSTGRES_USER: ${POSTGRES_USER:-zabbix}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
+    volumes:
+      - zbx-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-zabbix} -d ${POSTGRES_DB:-zabbix} || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - zbx-net
+
+  zabbix-server:
+    image: zabbix/zabbix-server-pgsql:alpine-7.4-latest
+    container_name: zbx-server
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      DB_SERVER_HOST: postgres
+      DB_SERVER_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER:-zabbix}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-zabbix}
+      # Taille du cache + housekeeper (à ajuster selon la charge)
+      ZBX_CACHE_SIZE: ${ZBX_CACHE_SIZE:-512M}
+      ZBX_HISTORY_CACHE_SIZE: ${ZBX_HISTORY_CACHE_SIZE:-256M}
+      ZBX_HISTORY_INDEX_CACHE_SIZE: ${ZBX_HISTORY_INDEX_CACHE_SIZE:-128M}
+      ZBX_STARTPOLLERS: ${ZBX_STARTPOLLERS:-10}
+    volumes:
+      - zbx-alerts:/var/lib/zabbix/alertscripts
+      - zbx-externals:/var/lib/zabbix/externalscripts
+    ports:
+      - "10051:10051" # port du serveur Zabbix (agents actifs/proxies)
+    healthcheck:
+      test: ["CMD-SHELL", "zabbix_server -V >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    networks:
+      - zbx-net
+
+  zabbix-web:
+    image: zabbix/zabbix-web-nginx-pgsql:alpine-7.4-latest
+    container_name: zbx-web
+    depends_on:
+      zabbix-server:
+        condition: service_started
+    restart: unless-stopped
+    environment:
+      DB_SERVER_HOST: postgres
+      DB_SERVER_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER:-zabbix}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-zabbix}
+      ZBX_SERVER_HOST: zabbix-server
+      ZBX_SERVER_PORT: 10051
+      PHP_TZ: ${PHP_TZ:-Europe/Paris}
+    ports:
+      - "8080:8080" # UI web (Nginx écoute sur 8080 dans cette image)
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    networks:
+      - zbx-net
+
+  zabbix-agent:
+    image: zabbix/zabbix-agent2:alpine-7.4-latest
+    container_name: zbx-agent
+    restart: unless-stopped
+    environment:
+      ZBX_SERVER_HOST: zabbix-server
+      ZBX_SERVER_PORT: 10051
+      ZBX_HOSTNAME: ${ZBX_HOSTNAME:-docker-host}
+    # Pour monitorer l’hôte où tourne Docker (CPU, FS, etc.)
+    privileged: true
+    #volumes:
+    #  - /:/rootfs:ro
+    #  - /var/run:/var/run:rw
+    #  - /sys:/sys:ro
+    #  - /proc:/proc:ro
+    
+    # Rajouter pour pouvoir ajouter le zabbix.conf
+    #volumes:
+    #  - ./zbx-agent2:/etc/zabbix/
+    networks:
+      - zbx-net
+
+networks:
+  zbx-net:
+    driver: bridge
+
+volumes:
+  zbx-db:
+  zbx-alerts:
+  zbx-externals:
