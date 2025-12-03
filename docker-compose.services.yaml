@@ -1,0 +1,108 @@
+##################
+# Docker cleanup #
+##################
+
+#docker stop $(docker ps -a -q)
+#docker system prune -a -f
+#docker volume prune -a -f 
+
+########################################################################
+# Notes FB/ Todo                                                       #
+# docker run -p "80:80" -v ${PWD}/app:/app mattrayner/lamp:latest-1804 #
+########################################################################
+
+#######################
+# docker-compose.yaml #
+#######################
+
+#networks:
+#  lab_network:
+#    name: lab_network
+#    ipam:
+#      config:
+#        - subnet: 172.20.0.0/24
+
+networks:
+  zbx-net:
+    external: true
+    #name: iut-colmar-tpsupervision_zbx-net
+
+services:
+ nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+     - 80:80
+    networks:
+      #lab_network:
+      zbx-net:
+        #ipv4_address: 172.20.0.10
+        ipv4_address: 172.18.0.51
+
+ juice-shop:
+    image: bkimminich/juice-shop
+    container_name: juice-shop
+    ports:
+     - 3000:3000
+    networks:
+      #lab_network:
+      zbx-net:
+        #ipv4_address: 172.20.0.11
+        ipv4_address: 172.18.0.52
+
+ ssh-server:
+    image: linuxserver/openssh-server:latest
+    container_name: ssh-server
+    environment:
+      - USER_NAME=student
+      - USER_PASSWORD=password123
+      - PASSWORD_ACCESS=true
+      - LOG_STDOUT=true
+      - TZ=Europe/Paris
+    ports:
+      - 2222:2222
+    networks:
+      #lab_network:
+      zbx-net:
+        #ipv4_address: 172.20.0.12
+        ipv4_address: 172.18.0.53
+
+
+ traffic-simulator:
+    image: busybox:latest
+    container_name: traffic-simulator
+    # Ce script simple va générer des requêtes et des erreurs.
+    networks:
+      #lab_network:
+      zbx-net:
+        #ipv4_address: 172.20.0.20
+        ipv4_address: 172.18.0.54
+    command: >
+      sh -c "while true; do
+        ping -c 1 172.20.0.51;
+        wget -q -O /dev/null http://172.18.0.51;
+        ping -c 1 172.18.0.52;
+        wget -q -O /dev/null http://172.18.0.52:3000;
+        nc -z -w 1 172.18.0.53 2222 || echo 'Connection attempt to SSH failed' >> /var/log/traffic.log;
+        sleep 5;
+      done"
+
+
+  snmp-simulator:
+    image: busybox:latest
+    container_name: traffic-simulator
+    # Ce script simple va générer des requêtes et des erreurs.
+    networks:
+      #lab_network:
+      zbx-net:
+        #ipv4_address: 172.20.0.20
+        ipv4_address: 172.18.0.54
+    command: >
+      sh -c "while true; do
+        ping -c 1 172.20.0.51;
+        wget -q -O /dev/null http://172.18.0.51;
+        ping -c 1 172.18.0.52;
+        wget -q -O /dev/null http://172.18.0.52:3000;
+        nc -z -w 1 172.18.0.53 2222 || echo 'Connection attempt to SSH failed' >> /var/log/traffic.log;
+        sleep 5;
+      done"

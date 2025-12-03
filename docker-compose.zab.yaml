@@ -1,5 +1,4 @@
 
-version: "3.9"
 
 services:
   postgres:
@@ -18,7 +17,8 @@ services:
       timeout: 5s
       retries: 10
     networks:
-      - zbx-net
+      zbx-net:
+        ipv4_address: 172.18.0.10
 
   zabbix-server:
     image: zabbix/zabbix-server-pgsql:alpine-7.4-latest
@@ -49,7 +49,8 @@ services:
       timeout: 5s
       retries: 10
     networks:
-      - zbx-net
+      zbx-net:
+        ipv4_address: 172.18.0.20
 
   zabbix-web:
     image: zabbix/zabbix-web-nginx-pgsql:alpine-7.4-latest
@@ -75,7 +76,8 @@ services:
       timeout: 5s
       retries: 10
     networks:
-      - zbx-net
+      zbx-net:
+        ipv4_address: 172.18.0.30
 
   zabbix-agent:
     image: zabbix/zabbix-agent2:alpine-7.4-latest
@@ -97,11 +99,16 @@ services:
     #volumes:
     #  - ./zbx-agent2:/etc/zabbix/
     networks:
-      - zbx-net
+      zbx-net:
+        ipv4_address: 172.18.0.40
 
 networks:
   zbx-net:
     driver: bridge
+    name: zbx-net
+    ipam:
+      config:
+        - subnet: 172.18.0.0/24
 
 volumes:
   zbx-db:

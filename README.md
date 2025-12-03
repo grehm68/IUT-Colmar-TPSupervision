@@ -3,12 +3,12 @@
 ## Startup ENV PROF
 
 ``` bash
-docker compose -f docker-compose.prof.yaml up
+docker compose -f docker-compose.services.yaml up -d
 ```
 ## Startup ENV ETU
 
 ``` bash
-docker compose -f docker-compose.etu.yaml up
+docker compose -f docker-compose.zab.yaml up -d
 ```
 Démarrer tous les containers
 ## Progress List
@@ -30,6 +30,8 @@ Démarrer tous les containers
  * User : Admin (avec un A maj)
  * Password : zabbix
 
+ Utilisation de `http://localhost:8080`
+
 ## Ping de l'agent depuis le serveur
 
 ### Se connecter à la console du serveur
@@ -42,7 +44,7 @@ docker exec -it zbx-server /bin/bash
 Depuis le serveur :
 
 ```bash
-zabbix_get -s <IP_de_l'agent> -k agent.ping
+zabbix_get -s IP_de_zbx-agent2 -k agent.ping
 ```
 
 Résultat attendu :
@@ -62,7 +64,7 @@ Cela confirme que :
 Depuis le serveur :
 
 ```bash
-zabbix_get -s <IP_de_l'agent> -k agent.version
+zabbix_get -s <IP_de_l_agent> -k agent.version
 ```
 
 Résultat attendu :
@@ -71,10 +73,21 @@ Résultat attendu :
 7.4.x (7.4.5)
 ```
 
+ ## Ajout Agent (version 1)
+ > **_NOTE:_** On ajoute l'hôte zbx-agent, en appliquant le template Linux servers
+ * Monitoring / Hosts / Create Host
+ ![Create Host](src/add-host-zbx-agent.png)
+
+ * Visualisation des graphs : Monitoring / Hosts / zbx-agent / Graphs
+ ![View graphs](src/host-graph.png)
+
+ Vous devez avoir des graphiques après quelques secondes
+
+
  ## Discovery
  > **_NOTE:_** On va utiliser la fonction de découverte Zabbix pour faire une découverte de l'infrastructure zabbix (sur votre poste) + de l'infrastructure du prof (distante).
   * Utiliser les commandes docker pour récuperer l'adresse du réseau utilisé par les containers.
-  ```
+  ``` bash
   docker network ls
   docker network inspect {name}
   ```
@@ -104,9 +117,6 @@ Avant de migrer, comprenons l'évolution.
   * *Avantage :* Traverse les pare-feux/NAT et soulage le serveur Zabbix.  
   * *Bonne pratique :* Toujours privilégier le **mode Actif**.
 
-Voici le texte formaté en Markdown, prêt à être intégré dans votre support de cours. J'ai ajouté des éléments visuels (code blocks, listes, citations) pour faciliter la lecture par les apprenants.
-
------
 
 ### 🔌 Mode Passif ou Mode Actif ?
 
@@ -147,47 +157,92 @@ C'est une fonctionnalité exclusive au mode Actif.
 
 -----
 
-### ⚠️ Attention à la configuration
 
-Pour que le mode Actif fonctionne, il faut impérativement vérifier deux choses :
 
-#### 1\. Côté Fichier de config (`zabbix_agent2.conf`)
 
-Vous devez remplir le champ `ServerActive`.
+### Installation zabbix agent2 (sur pc prof)
+> **_NOTE:_** On démarre plusieurs services (nginx, jice-shop, ssh-server) que l'on va pouvoir monitorer
+
+* Démarrage des services à monitorer (dans le réseau `lab_network` `172.20.0.0/24` )
+  ``` bash
+  docker compose -f docker-compose.services.yaml up -d
+  ```
+
+#### Installation de zabbix-agent2 sur l'hote nginx
+  * Connexion au serveur nginx
+    ``` bash
+    docker exec -it nginx bash
+    ```
+  * Installation de l'agent zabbix-agent2
+    ``` bash
+    apt update && apt install zabbix-agent2
+    ```
+#### Configuration de l'agent 
+  1. ⚠️ Pensez à faire un backup des fichiers de confs avant édition
+  2. 💡 Utilisez votre éditeur favori, et si il n'existe pas il faut l'installer : ```apt install vim```
+  3. ⚠️ Pour que le mode Actif fonctionne, il faut impérativement vérifier deux choses :
+
+##### 1\. Côté Fichier de config (`/etc/zabbix/zabbix_agent2.conf`)
+
+Vous devrez remplir le champ `ServerActive`. 
 
 ```ini
 # Le mode Passif utilise ce champ
-Server=ip_nginx #(ex: 172.18.0.4)
+Server=<IP DU SERVEUR ZABBIX> #(ex: 172.18.0.20)
 
 # Le mode Actif utilise OBLIGATOIREMENT ce champ (et le précédent - bug)
-ServerActive=ip_nginx #(ex: 172.18.0.4)
+ServerActive=<IP DU SERVEUR ZABBIX> #(ex: 172.18.0.20)
 
-# Indispensable en Actif : Le nom de l'agent doit être EXACTEMENT celui dans l'interface Web
+# Indispensable en Actif : Le nom de l'agent doit être EXACTEMENT celui dans l'interface Web.
 Hostname=nginx
+
+# Permet à chaque démarrage de l'agent de calculer les métriques (optionnel)
+ForceActiveChecksOnStart=1
 ```
-⚠️ Penser à redémarrer le service zabbix_agent2
+⚠️ Il faut penser à redémarrer le service zabbix_agent2
 ``` bash
 /etc/init.d/zabbix-agent2 restart
+/etc/init.d/zabbix-agent2 status
 ```
+💡 Dans le lab, la fonction restart n'arrive pas à killer le daemon `usr/sbin/zabbix_agent2`. Il faut tuer le process à la main, ou redémarrer le container
+ ``` bash
+    apt install procps  
+    ps aux | grep zabbix
+    kill -9 <ZABBIX-PID>    
+    /etc/init.d/zabbix-agent2 start
+    /etc/init.d/zabbix-agent2 status
+  ```
+  
+* Vérification en cli du fonctionnement de l'agent
+``` bash
+zabbix_agent2 --print 
+```
+✅ On doit avoir des datas
+
 #### 2\. Côté Interface Web (Templates)
 
 C'est l'erreur classique des débutants. Si vous configurez l'agent en actif mais que vous appliquez un template passif, rien ne remontera.
 
-  * ❌ **Ne prenez pas :** `Windows by Zabbix agent` (Souvent passif par défaut).
-  * ✅ **Prenez :** `Windows by Zabbix agent active`.
+  * ❌ **Ne prenez pas :** `Windows ou Linux by Zabbix agent` (Souvent passif par défaut).
+  * ✅ **Prenez :** `Windows ou Linux by Zabbix agent **active**`.
+  * ⚠️ Pour pouvoir sélectionner les templates, selectionnez `Templates` en `Template group`
 
-> **📝 Résumé pour l'atelier :**
+> **📝 Résumé  :**
 > "Pour vous simplifier la vie avec le réseau et ne pas perdre de données, configurez toujours vos serveurs en **Mode Actif** et choisissez les templates finissant par **'Active'**."
 
-😎 Les agents2 sont déjà installé sur certains hôtes.
+<!-- 😎 Les agents2 sont déjà installés sur certains hôtes. -->
 
-### Installation zabbix agent2 (sur pc prof)
-``` bash
-docker exec -it iut-colmar-tpsupervision-nginx-1 bash
-apt update && apt install zabbix-agent2
-```
-### Ajout de l'hote dans Zabbix
- ![Nginx Add Host](src/Nginx-Add-Host.png)
+   ![Nginx Add Host](src/Add-Host-Agent2.png)
+
+   Les actives checks doivent passer après quelques minutes
+   ![Active checks](src/Active-check.png)
+
+   💡 On peut aller voir les dashboard de l'hote, les problèmes remontés.
+
+   Naviguez dans les items, les triggers et les graphs pour comprendre leurs liaisons
+
+  ## SNMP
+   
 
   ## TIPS
   **Liste des containers**
@@ -196,13 +251,37 @@ apt update && apt install zabbix-agent2
   * zbx-postgres
 
   ### DOCKER TIPS
-   * Connection à un système docker en bash
+   * Connexion à un système docker en bash
    ``` bash
    docker exec -it <name> bash
    ```
+   * Connexion en root
+   ``` bash
+   
+   ```
+   https://blog.stephane-robert.info/docs/conteneurs/moteurs-conteneurs/docker/cheat-sheet/
+
+   * Lister un réseau
+   ``` bash
+  docker network ls
+  ```
+   * Voir les ip d'un réseau
+   ``` bash
+  docker network inspect {name}
+  ```
 
    ### ENV PROF TIPS
-   * Connection du server Zabbix au lab_network
+   * Connexion du server Zabbix au lab_network
    ``` bash
    docker network connect lab_network zbx-server
    ```
+
+    * Voir les ports en écoutes avec netstat
+    ``` bash
+    apt install net-tools
+    netstat 
+
+    * Installer PS pour voir les processus
+    ``` bash
+    apt install procps      
+    ```
