@@ -87,22 +87,3 @@ services:
         sleep 5;
       done"
 
-
-  snmp-simulator:
-    image: busybox:latest
-    container_name: traffic-simulator
-    # Ce script simple va générer des requêtes et des erreurs.
-    networks:
-      #lab_network:
-      zbx-net:
-        #ipv4_address: 172.20.0.20
-        ipv4_address: 172.18.0.54
-    command: >
-      sh -c "while true; do
-        ping -c 1 172.20.0.51;
-        wget -q -O /dev/null http://172.18.0.51;
-        ping -c 1 172.18.0.52;
-        wget -q -O /dev/null http://172.18.0.52:3000;
-        nc -z -w 1 172.18.0.53 2222 || echo 'Connection attempt to SSH failed' >> /var/log/traffic.log;
-        sleep 5;
-      done"

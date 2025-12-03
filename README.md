@@ -241,8 +241,55 @@ C'est l'erreur classique des débutants. Si vous configurez l'agent en actif mai
 
    Naviguez dans les items, les triggers et les graphs pour comprendre leurs liaisons
 
-  ## SNMP
-   
+  ## SNMP (⚠️à terminer)
+
+  ### Démarrage du réseau SNMP
+  ⚠️ Attention les ips fixes !
+
+  ### Connexion au serveur zab
+  ```docker network connect docker_snmp_simulator_simulation_lan_net zbx-server```
+  Tester avec un ping
+
+## Intégration d'API
+
+### Récupéreration des états de Fortnite et intégration dans Zabbix
+
+#### Création d'un item 
+
+    Name : Choisissez le nom que vous voulez, mais mettez Fortnite dedans
+    Type : HTTP Agent
+    Key : fortnite.status
+    URL : https://status.epicgames.com/api/v2/summary.json
+    Request Method : GET
+    Laisser les autres valeurs par défaut
+    ![Create item fortnite](src/item-fortnite.png)
+
+  Allez dans l'onglet **Preprocessing**
+
+  ![alt text](src/pre-processing-fortnite.png)
+  
+  Ajouter un **Preprocessing Step** :
+
+  **Type** : JSONPath
+  
+  **Expression** : `$.components[?(@.name=='Fortnite')].status`
+
+  **Type of information** : text
+#### Test de l'item
+
+ * Lancement du test
+
+![alt text](src/item-test.png)
+
+* Visualisation du test
+
+![alt text](src/item-result.png)
+
+
+  * Aller dans Monitoring / Latest Data / 
+  * Cliquer sur le nom et Selectionner **Values** pour voir les valeurs récupérées
+
+  
 
   ## TIPS
   **Liste des containers**
