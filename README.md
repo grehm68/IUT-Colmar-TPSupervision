@@ -1,16 +1,52 @@
 # IUT-Colmar-TPSupervision
 
+## Introduction à la supervision réseau avec Zabbix
+
+Dans un monde où les infrastructures télécoms et réseaux sont le socle de toute communication, **la supervision devient un pilier incontournable** pour garantir disponibilité, performance et sécurité. Les entreprises et opérateurs doivent anticiper les pannes, surveiller les ressources et réagir rapidement aux incidents pour maintenir un service optimal. **Zabbix**, solution open source de référence, répond à ces besoins en offrant une surveillance en temps réel des équipements, serveurs et applications, tout en générant des alertes proactives. Pour un futur ingénieur en télécoms et réseaux, maîtriser ces outils n’est pas seulement une compétence technique : c’est une exigence pour assurer la qualité de service et optimiser les infrastructures. Ce TP vous plongera au cœur de la supervision moderne, en vous permettant de comprendre, configurer et exploiter Zabbix dans un environnement professionnel.
+
+## Pré-requis
+
+* Docker
+* Git ou download du dépôt https://github.com/grehm68/IUT-Colmar-TPSupervision
+
+💡 Vscode peut-être pratique pour avoir un environnement complet. Et interpreter facilement le Markdown
+
+## Ressources 
+
+* Documentation officielle Zabbix : https://www.zabbix.com/documentation/current/en/manual ⚠️ Attention de bien être en version 7.4
+* Dépôt https://github.com/grehm68/IUT-Colmar-TPSupervision
+* Visualisation correct du Markdown https://github.com/grehm68/IUT-Colmar-TPSupervision/blob/main/README.md
+
+## Récupération de dépot
+
+* Créer un répertoire de travail sur votre poste
+* Récupérer le dépot ci-dessus, via git ou en le téléchargant directement
+
+## Démarrage de l'environnement Zabbix
+
+* Ouvrir un terminal et exécuter `docker`, vérifier que le service Docker est bien démarré
+* `docker -v` pour vérifier que cela fonctionne
+* Démarrer les containers en vous positionnant dans le répertoire précédent pour exécuter 
+
+    ``` bash
+    docker compose -f docker-compose.zab.yaml up -d
+    ```
+* Voir les containers démarrés : `docker ps`
+* Voir les containers démarrés et leurs ports `docker ps -a --format "table {{.Names}}\t{{.Ports}}"` 
+* Vous devez avoir 
+  ``` bash
+  zbx-web                          0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
+  zbx-server                       0.0.0.0:10051->10051/tcp, [::]:10051->10051/tcp
+  zbx-postgres                     5432/tcp
+  zbx-agent                        10050/tcp, 31999/tcp
+  ```
+
 ## Startup ENV PROF
 
 ``` bash
 docker compose -f docker-compose.services.yaml up -d
 ```
-## Startup ENV ETU
 
-``` bash
-docker compose -f docker-compose.zab.yaml up -d
-```
-Démarrer tous les containers
 ## Progress List
 
 - [ ] Démarrer tous les containers Zabbix sans erreur
@@ -73,33 +109,38 @@ Résultat attendu :
 7.4.x (7.4.5)
 ```
 
- ## Ajout Agent (version 1)
- > **_NOTE:_** On ajoute l'hôte zbx-agent, en appliquant le template Linux servers
- * Monitoring / Hosts / Create Host
- ![Create Host](src/add-host-zbx-agent.png)
+## Ajout Agent (version 1)
+> **_NOTE:_** On ajoute l'hôte zbx-agent, en appliquant le template Linux servers
 
- * Visualisation des graphs : Monitoring / Hosts / zbx-agent / Graphs
- ![View graphs](src/host-graph.png)
+* Monitoring / Hosts / Create Host
 
- Vous devez avoir des graphiques après quelques secondes
+![Create Host](src/add-host-zbx-agent.png)
+
+* Visualisation des graphs : Monitoring / Hosts / zbx-agent / Graphs
+
+![View graphs](src/host-graph.png)
+
+Vous devez avoir des graphiques après quelques secondes
 
 
- ## Discovery
- > **_NOTE:_** On va utiliser la fonction de découverte Zabbix pour faire une découverte de l'infrastructure zabbix (sur votre poste) + de l'infrastructure du prof (distante).
-  * Utiliser les commandes docker pour récuperer l'adresse du réseau utilisé par les containers.
-  ``` bash
+## Discovery
+> **_NOTE:_** On va utiliser la fonction de découverte Zabbix pour faire une découverte de l'infrastructure zabbix (sur votre poste) + de l'infrastructure du prof (distante).
+
+* Utiliser les commandes docker pour récuperer l'adresse du réseau utilisé par les containers.
+``` bash
   docker network ls
   docker network inspect {name}
-  ```
-  * Aller dans le menu Discovery et renseigner au point 5 l'adresse de votre réseau zabbix + l'adresse du réseau du prof
-  * Au point 7 renseigner les ports 
-  > [!TIP]
-  > On peut utiliser ICMP pour faire la découverte
+```
+
+* Aller dans le menu Discovery et renseigner au point 5 l'adresse de votre réseau zabbix + l'adresse du réseau du prof
+* Au point 7 renseigner les ports 
+> [!TIP]
+> On peut utiliser ICMP pour faire la découverte
   
-  > [!CAUTION]
-  > Renseigner les ports
+> [!CAUTION]
+> Renseigner les ports
   
-  ![Menu Discovery](image.png)
+![Menu Discovery](src/discovery.png)
 
 ## Utilisation de Zabbix agent2
 
@@ -160,10 +201,10 @@ C'est une fonctionnalité exclusive au mode Actif.
 
 
 
-### Installation zabbix agent2 (sur pc prof)
+### Installation zabbix agent2
 > **_NOTE:_** On démarre plusieurs services (nginx, jice-shop, ssh-server) que l'on va pouvoir monitorer
 
-* Démarrage des services à monitorer (dans le réseau `lab_network` `172.20.0.0/24` )
+* Démarrage des services à monitorer
   ``` bash
   docker compose -f docker-compose.services.yaml up -d
   ```
@@ -289,7 +330,44 @@ C'est l'erreur classique des débutants. Si vous configurez l'agent en actif mai
   * Aller dans Monitoring / Latest Data / 
   * Cliquer sur le nom et Selectionner **Values** pour voir les valeurs récupérées
 
-  
+## Création de Dashboard
+
+### Visualisation des dashboards déjà présent
+
+### Widget n°1 – Liste des Problèmes Actifs
+
+Ce widget représente la « to-do list » opérationnelle en temps réel.
+
+1. Cliquer sur **Add widget**.
+2. **Type :** `Problems`.
+3. **Name :** `🔥 Alertes en cours`.
+4. **Show :** `Recent problems`
+
+   > Affiche les problèmes actifs ainsi que ceux résolus récemment pour suivi.
+5. **Show tags :** `1`
+
+   > Affiche la première colonne de tags (utile pour la répartition par équipe).
+6. **Show operational data :** `Separately`
+
+   > Présente la valeur actuelle (ex. « 93 % used ») dans une colonne dédiée.
+7. **Advanced filter (facultatif) :**
+
+   * Tag name : `Team`
+   * Tag value : `SysAdmin`
+8. Cliquer sur **Add**.
+
+### Créer un dashboard
+Créez votre propre dashboard en vous basant sur les hôtes disponibles. 
+
+N'hésitez pas à être créatif
+
+### Création de dashboard Fortnite
+
+* Aller dans Dashboard / Create Dashboard
+
+* Add widget type HoneyComb
+* Dans **Item-Patterns** choisir votre item Fornite créé précédemment
+* Save changes
 
   ## TIPS
   **Liste des containers**
