@@ -86,4 +86,42 @@ services:
         nc -z -w 1 172.18.0.53 2222 || echo 'Connection attempt to SSH failed' >> /var/log/traffic.log;
         sleep 5;
       done"
-
+ router_1:
+    build:
+      context: router
+      dockerfile: Dockerfile
+    container_name: router
+    networks:
+      zbx-net:
+        ipv4_address: 172.18.0.55 # Adaptez cette IP
+    environment:
+      DEVICE_TYPE: router
+      SYS_NAME_VAL: "EdgeRouter-ParisPOP-Sim"
+      SYS_LOCATION_VAL: "POP IUT, Rue du Grillenbreit, Colmar, France"
+      SYS_CONTACT_VAL: "noc@uha.fr"
+      SYS_DESCR_VAL: "Juniper MX204 Universal Routing Platform - Simulated Edge"
+      SYS_OBJECT_ID_VAL: .1.3.6.1.4.1.2636.1.1.1.2.67 # Exemple Juniper MX
+      # ... autres variables pour le routeur ...
+    restart: unless-stopped
+ 
+  
+ network_switch_1:
+    build:
+      context: network_switch
+      dockerfile: Dockerfile
+    container_name: switch
+    networks:
+      zbx-net:
+        ipv4_address: 172.18.0.56 # Adaptez cette IP
+    environment:
+      DEVICE_TYPE: switch
+      SYS_NAME_VAL: "CoreSwitch-DatacenterA-Sim"
+      SYS_LOCATION_VAL: "Datacenter A, Baie Principale"
+      SYS_CONTACT_VAL: "noc@example.com"
+      SYS_DESCR_VAL: "Juniper Switch - Simulated Core"
+      SYS_OBJECT_ID_VAL: .1.3.6.1.4.1.9.1.2467 # Exemple pour C9300
+      IF_NUMBER_VAL: 4 # Exemple
+      IF1_DESCR_VAL: "TenGigabitEthernet1/0/1 - Uplink Router"
+      IF1_MAC_VAL: "00:AA:BB:CC:DD:01"
+      # ... autres variables pour le switch ...
+    restart: unless-stopped

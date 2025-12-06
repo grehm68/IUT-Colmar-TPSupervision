@@ -17,6 +17,49 @@ Dans un monde où les infrastructures télécoms et réseaux sont le socle de to
 * Dépôt https://github.com/grehm68/IUT-Colmar-TPSupervision
 * Visualisation correct du Markdown https://github.com/grehm68/IUT-Colmar-TPSupervision/blob/main/README.md
 
+## Notation du TP
+
+L’évaluation de ce TP se base sur un rapport que vous constiturez au formation PDF (et uniquement dans ce format).
+
+Ce rapport contiendra 2 parties :
+* Le tableau récapitulatif ci-dessous avec les réponses (noté /10) 
+* Un compte rendu de TP où vous expliquerez les différents étapes du TP . Vous mettrez des captures d'écrans de vos réalisations. (noté /8)
+
+2 points seront attribués à la qualité du rapport et au respect des consignes.
+
+4 points bonus seront attribués aux réalisations supplémentaires que vous pourrez réaliser en plus de ce qui est indiqué.
+
+Vous devez fournir un rapport au format PDF (uniquement!) nommé de la sorte NOM-Prénom-Rapport-Zabbix.pdf
+
+### Tableau récapitulatif (à intégrer au rapport)
+
+|Question | Réponse |
+|:--------|:--------:|
+|Liste des containers Zabbix démarrés avec la commande `docker ps` | |
+|Screenshot de la 1ère connexion à Zabbix |                          |
+|Résultat du ping depuis le serveur vers l'agent avec `zabbix_get`||
+|Screenshot de la découverte du réseau zabbix ||
+|Screenshot de 3 hôtes monitorés Monitoring / Hosts (avec le status Availability non grisé) ||
+|Screenshot d'un graph (ou dashboard) de monitoring d'un hote en SNMP (interface eth0)  ||
+|Screenshot du dashboard Fortnite ||
+
+
+## Liste de progression
+
+- [ ] Démarrer tous les containers Zabbix sans erreur
+- [ ] Connexion au portail web de zabbix
+- [ ] Faire un ping depuis le serveur vers l'agent avec zabbix_get
+- [ ] Faire une découverte du réseau zabbix
+- [ ] Monitorer les machines trouvées avec les services associés
+- [ ] Monitorer via SNMP
+- [ ] Monitorer via API (🕹️Fortnite)
+- [ ] Création de dashboard
+- [ ] Envoyer les alertes sur un webhook
+
+## Plan réseau
+![Plan réseau général](src/Schema.png)
+
+
 ## Récupération de dépot
 
 * Créer un répertoire de travail sur votre poste
@@ -47,17 +90,6 @@ Dans un monde où les infrastructures télécoms et réseaux sont le socle de to
 docker compose -f docker-compose.services.yaml up -d
 ```
 
-## Progress List
-
-- [ ] Démarrer tous les containers Zabbix sans erreur
-- [ ] Connexion au portail web de zabbix
-- [ ] Faire un ping depuis le serveur vers l'agent avec zabbix_get
-- [ ] Faire une découverte du réseau zabbix
-- [ ] Faire une découverte du réseau prof (icmp, web, snmp)
-- [ ] Monitorer les machines trouvées avec les services associés
-- [ ] Monitorer SNMP
-- [ ] Monitorer les vulnérabilités du server xxx
-- [ ] Envoyer les alertes sur un webhook
 
 ## Architecture Zabbix en containers
 ![alt text](src/Zabbix-Containers.drawio.svg)
@@ -282,20 +314,46 @@ C'est l'erreur classique des débutants. Si vous configurez l'agent en actif mai
 
    Naviguez dans les items, les triggers et les graphs pour comprendre leurs liaisons
 
-  ## SNMP (⚠️à terminer)
+  ## SNMP
 
   ### Démarrage du réseau SNMP
-  ⚠️ Attention les ips fixes !
+  
+  1 router et 1 switch sont dispos en snmp (uniquement !)
 
-  ### Connexion au serveur zab
-  ```docker network connect docker_snmp_simulator_simulation_lan_net zbx-server```
-  Tester avec un ping
+  * Créer un hostgroup Networks
+
+  * Créer 2 hotes en snmp (router et switch)
+  ![alt text](src/add-snmp.png)
+
+    * le router utilise un template snmp cisco
+    * le switch utilise un template snmp juniper
+
+  * Passer la communauté SNMP via les Macros (permet de changer les noms des communautés)
+  ![alt text](src/community.png)
+
+  * Afficher un graph sur les interfaces
+
+## Monitoring Web
+On peut facilement faire du monitoring de site web via `Web scenarios`
+
+* Aller sur l'hôte Zabbix server (ou un autre) Monitoring / Hosts
+* Choisir Configuration / Web
+* Choisir **Create web scenario**
+* Mettre un nom et laisser les valeurs par défaut
+* Aller dans **Steps** et rajouter l'URL à tester. ⚠️ Les Urls internes ne fonctionnent pas dans la maquette. Utiliser une résolution DNS externe (type www.google.fr)
+
+* Pour visualiser le réponse il faut aller dans **Monitoring / Hosts** et aller dans la colonne `Web` sur la droite
+
 
 ## Intégration d'API
 
 ### Récupéreration des états de Fortnite et intégration dans Zabbix
 
 #### Création d'un item 
+ 
+ On associera cet item à un hote déjà existant (zabbix server par ex)
+
+ Allez dans **Data Collection / Hosts / Selectionner l'hote / items** puis **Create Item** (en haut à droite)
 
     Name : Choisissez le nom que vous voulez, mais mettez Fortnite dedans
     Type : HTTP Agent
@@ -303,7 +361,8 @@ C'est l'erreur classique des débutants. Si vous configurez l'agent en actif mai
     URL : https://status.epicgames.com/api/v2/summary.json
     Request Method : GET
     Laisser les autres valeurs par défaut
-    ![Create item fortnite](src/item-fortnite.png)
+
+  ![Create item fortnite](src/item-fortnite.png)
 
   Allez dans l'onglet **Preprocessing**
 
@@ -316,6 +375,7 @@ C'est l'erreur classique des débutants. Si vous configurez l'agent en actif mai
   **Expression** : `$.components[?(@.name=='Fortnite')].status`
 
   **Type of information** : text
+
 #### Test de l'item
 
  * Lancement du test
@@ -330,10 +390,18 @@ C'est l'erreur classique des débutants. Si vous configurez l'agent en actif mai
   * Aller dans Monitoring / Latest Data / 
   * Cliquer sur le nom et Selectionner **Values** pour voir les valeurs récupérées
 
+* Créer un trigger pour déclancher une alerte en fonction du status <> operational
+![alt text](src/fortnite-trigger.png)
+
 ## Création de Dashboard
 
 ### Visualisation des dashboards déjà présent
 
+Aller dans Dashboard pour visusaliser les dashboard déjà présents. N'hésitez pas à naviguer dans les dashboard du serveurs et d'autres.
+
+Vous pouvez également retrouver les dashboard via le menu Monitoring / Hosts / Dashboard.
+
+Ajoutez dans votre rapport des dashboard de type `graph`, `pie`,
 ### Widget n°1 – Liste des Problèmes Actifs
 
 Ce widget représente la « to-do list » opérationnelle en temps réel.
@@ -361,6 +429,9 @@ Créez votre propre dashboard en vous basant sur les hôtes disponibles.
 
 N'hésitez pas à être créatif
 
+### Création de dashboard réseau
+Utilisez les hotes router et switch pour faire des visualisation de réseaux
+
 ### Création de dashboard Fortnite
 
 * Aller dans Dashboard / Create Dashboard
@@ -369,44 +440,43 @@ N'hésitez pas à être créatif
 * Dans **Item-Patterns** choisir votre item Fornite créé précédemment
 * Save changes
 
-  ## TIPS
-  **Liste des containers**
-  * zbx-web
-  * zbx-server
-  * zbx-postgres
 
-  ### DOCKER TIPS
-   * Connexion à un système docker en bash
-   ``` bash
-   docker exec -it <name> bash
-   ```
-   * Connexion en root
-   ``` bash
-   
-   ```
-   https://blog.stephane-robert.info/docs/conteneurs/moteurs-conteneurs/docker/cheat-sheet/
+## TIPS
 
-   * Lister un réseau
-   ``` bash
-  docker network ls
-  ```
-   * Voir les ip d'un réseau
-   ``` bash
-  docker network inspect {name}
-  ```
+* Démarrer les containers via un compose file 
+``` bash
+docker compose -f docker-compose.zab.yaml up -d
+```
 
-   ### ENV PROF TIPS
-   * Connexion du server Zabbix au lab_network
-   ``` bash
-   docker network connect lab_network zbx-server
-   ```
+* Connexion à un système docker en bash
+``` bash
+docker exec -it <name> bash
+```
+* Connexion en root
+``` bash
+docker exec -it --user root <name> bash
+```
 
-    * Voir les ports en écoutes avec netstat
-    ``` bash
-    apt install net-tools
-    netstat 
+* Docker cheat sheet https://blog.stephane-robert.info/docs/conteneurs/moteurs-conteneurs/docker/cheat-sheet/
 
-    * Installer PS pour voir les processus
-    ``` bash
-    apt install procps      
-    ```
+* Lister les réseaux docker
+``` bash
+docker network ls
+```
+* Voir les ip d'un réseau
+``` bash
+docker network inspect {name}
+```
+
+* Voir les ports en écoutes avec netstat
+``` bash
+apt install net-tools
+netstat 
+```
+
+* Installer PS pour voir les processus
+``` bash
+apt install procps      
+```
+
+* Doc docker_snmp_simulator https://github.com/Antoine-O/docker_snmp_simulator/blob/master/Readme.md
