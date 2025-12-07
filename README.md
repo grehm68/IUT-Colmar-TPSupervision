@@ -27,9 +27,9 @@ Ce rapport contiendra 2 parties :
 
 2 points seront attribués à la qualité du rapport et au respect des consignes.
 
-4 points bonus seront attribués aux réalisations supplémentaires que vous pourrez réaliser en plus de ce qui est indiqué.
+4 points bonus seront attribués aux réalisations supplémentaires que vous pourrez réaliser en plus de ce qui est indiqué. (par ex : utilisation des Actions trigger, sur des webhook ou des scripts)
 
-Vous devez fournir un rapport au format PDF (uniquement!) nommé de la sorte NOM-Prénom-Rapport-Zabbix.pdf
+Vous devez fournir un rapport au format **PDF** (uniquement!) nommé de la sorte **NOM-Prénom-Rapport-Zabbix.pdf**
 
 ### Tableau récapitulatif (à intégrer au rapport)
 
@@ -54,9 +54,67 @@ Vous devez fournir un rapport au format PDF (uniquement!) nommé de la sorte NOM
 - [ ] Monitorer via SNMP
 - [ ] Monitorer via API (🕹️Fortnite)
 - [ ] Création de dashboard
-- [ ] Envoyer les alertes sur un webhook
+- [ ] Envoyer les alertes sur un webhook (à faire)
 
-## Plan réseau
+
+## Architecture Zabbix 7.0 et vocabulaire
+
+* **Zabbix Server (zabbix\_server) :**
+
+  * Le cerveau. Écrit en Go (depuis la 7.0, anciennement en C).
+
+  * **Rôles :**  
+    * **Pollers :** Processus qui collectent les données (agents passifs, SNMP, JMX, IPMI).  
+    * **Trappers :** Processus qui écoutent (sur le port 10051\) les données envoyées par les agents actifs ou les proxies.  
+    * **History Syncer :** Écrit les données collectées dans la base de données.  
+    * **Timer :** Gère le temps, les maintenances, les actions.  
+    * **Alerters :** Gèrent l'envoi des notifications (email, scripts, webhooks).
+
+![alt text](src/Zabbix-Architecture.png)
+
+**Bonne Pratique :** Le serveur Zabbix ne doit faire *que* Zabbix. Ne pas installer d'autres services (serveur web, mail) dessus pour des raisons de performance.
+
+* **Base de Données (PostgreSQL / TimescaleDB) :**  
+  * Le cœur du stockage.  
+  * **Stocke quoi ?**  
+    * **Configuration :** Hôtes, Items, Triggers, Maps... (tout sauf l'historique).  
+    * **Historique :** Les données brutes (ex: 15.2% CPU à 10:01).  
+    * **Tendances :** Les données agrégées (moyenne par heure) pour garder une vision long terme sans saturer la base.
+
+    
+
+  **Bonne Pratique :** Utiliser **PostgreSQL** (recommandé) avec **TimescaleDB**. TimescaleDB est une extension qui optimise PostgreSQL pour les séries temporelles, résultant en des performances 10x à 100x supérieures pour les graphiques et le "housekeeping".
+
+
+* **Frontend Web (Nginx \+ PHP) :**  
+  * L'interface de configuration et de visualisation.  
+  * Communique avec le Zabbix Server via l'API Zabbix et lit/écrit dans la base de données (pour la configuration).
+
+
+* **Zabbix Agent (Agent) :**  
+  * Le collecteur local sur les hôtes (Windows, Linux). Détaillé au Module 3\.
+
+
+* **Zabbix Proxy (zabbix\_proxy) :**  
+  * Un "mini" serveur Zabbix déporté. Il collecte les données de ses agents, les stocke localement (dans une base SQLite ou PostgreSQL), puis les envoie en *batch* au Zabbix Server principal.
+
+
+  * **Cas d'usage (REX) :**
+
+
+    * **Supervision distribuée :** Indispensable pour superviser des sites distants (agences bancaires, magasins) connectés par un WAN. Un proxy par site limite le trafic réseau à une seule connexion vers le central.
+
+    
+
+    * **Performance :** Si vous avez plus de 5 000 hôtes, le serveur Zabbix principal devient un goulot d'étranglement. On utilise des proxies pour répartir la charge de collecte, même s'ils sont dans le même datacenter.
+
+    
+
+    * **Réseaux isolés (DMZ) :** On place un proxy en DMZ pour collecter les données des serveurs publics. Le proxy est le seul à initier la connexion vers le Zabbix Server (en mode actif), gardant le flux DMZ \-\> LAN sécurisé et maîtrisé.
+
+
+
+## Plan réseau du TP
 ![Plan réseau général](src/Schema.png)
 
 
@@ -83,16 +141,6 @@ Vous devez fournir un rapport au format PDF (uniquement!) nommé de la sorte NOM
   zbx-postgres                     5432/tcp
   zbx-agent                        10050/tcp, 31999/tcp
   ```
-
-## Startup ENV PROF
-
-``` bash
-docker compose -f docker-compose.services.yaml up -d
-```
-
-
-## Architecture Zabbix en containers
-![alt text](src/Zabbix-Containers.drawio.svg)
 
 ## Se connecter sur le container zbx-web sur le port 8080
  * User : Admin (avec un A maj)
@@ -156,7 +204,7 @@ Vous devez avoir des graphiques après quelques secondes
 
 
 ## Discovery
-> **_NOTE:_** On va utiliser la fonction de découverte Zabbix pour faire une découverte de l'infrastructure zabbix (sur votre poste) + de l'infrastructure du prof (distante).
+> **_NOTE:_** On va utiliser la fonction de découverte Zabbix pour faire une découverte de l'infrastructure zabbix + des services.
 
 * Utiliser les commandes docker pour récuperer l'adresse du réseau utilisé par les containers.
 ``` bash
@@ -164,13 +212,13 @@ Vous devez avoir des graphiques après quelques secondes
   docker network inspect {name}
 ```
 
-* Aller dans le menu Discovery et renseigner au point 5 l'adresse de votre réseau zabbix + l'adresse du réseau du prof
+* Aller dans le menu Discovery et renseigner au point 5 l'adresse de votre réseau zabbix
 * Au point 7 renseigner les ports 
 > [!TIP]
 > On peut utiliser ICMP pour faire la découverte
   
 > [!CAUTION]
-> Renseigner les ports
+> Renseigner les ports en fonction du schéma réseau
   
 ![Menu Discovery](src/discovery.png)
 
@@ -308,16 +356,15 @@ C'est l'erreur classique des débutants. Si vous configurez l'agent en actif mai
    ![Nginx Add Host](src/Add-Host-Agent2.png)
 
    Les actives checks doivent passer après quelques minutes
+
    ![Active checks](src/Active-check.png)
 
    💡 On peut aller voir les dashboard de l'hote, les problèmes remontés.
 
    Naviguez dans les items, les triggers et les graphs pour comprendre leurs liaisons
 
-  ## SNMP
+  ## Monitoring en SNMP
 
-  ### Démarrage du réseau SNMP
-  
   1 router et 1 switch sont dispos en snmp (uniquement !)
 
   * Créer un hostgroup Networks
