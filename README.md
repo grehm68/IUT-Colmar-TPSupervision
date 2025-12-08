@@ -115,7 +115,7 @@ Vous devez fournir un rapport au format **PDF** (uniquement!) nommé de la sorte
 
 
 ## Plan réseau du TP
-![Plan réseau général](src/Schema.png)
+![Plan réseau général](src/schema.png)
 
 
 ## Récupération de dépot
