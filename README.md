@@ -495,7 +495,7 @@ Utilisez les hotes router et switch pour faire des visualisation de réseaux
 `vfs.file.exists["/tmp/iut.txt"]`
 
 📌 Création d'un Trigger Expression:
-`last(/hostname/vfs.file.exists[/tmp/iut])=0`
+`last(/hostname/vfs.file.exists[/tmp/iut.txt])=0`
 
 🚀 Pourquoi c'est important :
 * Processus ininterrompus : Garantir que les fichiers critiques restent toujours accessibles.
