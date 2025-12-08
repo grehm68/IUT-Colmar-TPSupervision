@@ -42,6 +42,7 @@ Vous devez fournir un rapport au format **PDF** (uniquement!) nommé de la sorte
 |Screenshot de 3 hôtes monitorés Monitoring / Hosts (avec le status Availability non grisé) ||
 |Screenshot d'un graph (ou dashboard) de monitoring d'un hote en SNMP (interface eth0)  ||
 |Screenshot du dashboard Fortnite ||
+|Screenshot du problème + problème résolu (fichier manquant par ex) ||
 
 
 ## Liste de progression
