@@ -160,7 +160,7 @@ docker exec -it zbx-server /bin/bash
 Depuis le serveur :
 
 ```bash
-zabbix_get -s IP_de_zbx-agent2 -k agent.ping
+zabbix_get -s IP_de_zbx-agent -k agent.ping
 ```
 
 Résultat attendu :
