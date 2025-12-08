@@ -1,27 +1,3 @@
-##################
-# Docker cleanup #
-##################
-
-#docker stop $(docker ps -a -q)
-#docker system prune -a -f
-#docker volume prune -a -f 
-
-########################################################################
-# Notes FB/ Todo                                                       #
-# docker run -p "80:80" -v ${PWD}/app:/app mattrayner/lamp:latest-1804 #
-########################################################################
-
-#######################
-# docker-compose.yaml #
-#######################
-
-#networks:
-#  lab_network:
-#    name: lab_network
-#    ipam:
-#      config:
-#        - subnet: 172.20.0.0/24
-
 networks:
   zbx-net:
     external: true
