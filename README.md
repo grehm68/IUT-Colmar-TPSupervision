@@ -23,7 +23,7 @@ L’évaluation de ce TP se base sur un rapport que vous constiturez au formatio
 
 Ce rapport contiendra 2 parties :
 * Le tableau récapitulatif ci-dessous avec les réponses (noté /10) 
-* Un compte rendu de TP où vous expliquerez les différents étapes du TP . Vous mettrez des captures d'écrans de vos réalisations. (noté /8)
+* Un compte rendu de TP où vous expliquerez les différents étapes du TP. Vous mettrez des captures d'écrans de vos réalisations. (noté /8)
 
 2 points seront attribués à la qualité du rapport et au respect des consignes.
 
@@ -31,9 +31,9 @@ Ce rapport contiendra 2 parties :
 
 Vous devez fournir un rapport au format **PDF** (uniquement!) nommé de la sorte **NOM-Prénom-Rapport-Zabbix.pdf**
 
-### Tableau récapitulatif (à intégrer au rapport)
+### Tableau récapitulatif (à intégrer directement au rapport en 1ère page)
 
-|Question | Réponse |
+|Question | Réponse (à ajouter) |
 |:--------|:--------:|
 |Liste des containers Zabbix démarrés avec la commande `docker ps` | |
 |Screenshot de la 1ère connexion à Zabbix |                          |
@@ -55,7 +55,9 @@ Vous devez fournir un rapport au format **PDF** (uniquement!) nommé de la sorte
 - [ ] Monitorer via SNMP
 - [ ] Monitorer via API (🕹️Fortnite)
 - [ ] Création de dashboard
+- [ ] Création et correction de problèmes
 - [ ] Envoyer les alertes sur un webhook (à faire)
+- [ ] Execution d'un script (à faire)
 
 
 ## Architecture Zabbix 7.0 et vocabulaire
@@ -126,8 +128,7 @@ Vous devez fournir un rapport au format **PDF** (uniquement!) nommé de la sorte
 
 ## Démarrage de l'environnement Zabbix
 
-* Ouvrir un terminal et exécuter `docker`, vérifier que le service Docker est bien démarré
-* `docker -v` pour vérifier que cela fonctionne
+* Ouvrir un terminal et exécuter `docker -v`. Vérifier que le service Docker est bien démarré
 * Démarrer les containers en vous positionnant dans le répertoire précédent pour exécuter 
 
     ``` bash
@@ -219,7 +220,7 @@ Vous devez avoir des graphiques après quelques secondes
 > On peut utiliser ICMP pour faire la découverte
   
 > [!CAUTION]
-> Renseigner les ports en fonction du schéma réseau
+> Renseigner les ports en fonction du schéma réseau (en + de ICMP)
   
 ![Menu Discovery](src/discovery.png)
 
@@ -503,6 +504,17 @@ Utilisez les hotes router et switch pour faire des visualisation de réseaux
 * Intégrité des données : Réduire au minimum le risque de perte ou de déplacement des données.
 * Réactivité : Détecter instantanément les fichiers manquants et agir rapidement.
 
+## Intégration WebHook Discord
+ * Avoir un serveur Discord ouvert
+ * Activer le template Discord dans **Media Types**
+ * Créer un media type Discord de type webhook
+ * Dans Alerts / Actions / Trigger Actions, activer le Report problems to Zabbix administrators
+
+ ![alt text](src/enable-trigger-action-admin.png)
+
+ ## Idées pour aller plus loin
+* UserParameter, créer ses propres datas
+* Scan de vuln avec trivy
 
 ## TIPS
 
@@ -543,3 +555,8 @@ apt install procps
 ```
 
 * Doc docker_snmp_simulator https://github.com/Antoine-O/docker_snmp_simulator/blob/master/Readme.md
+
+* Nettoyage des containers à la fin du TP
+``` bash
+docler system prune
+```
