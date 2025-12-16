@@ -129,7 +129,19 @@ Vous devez fournir un rapport au format **PDF** (uniquement!) nommé de la sorte
 ## Démarrage de l'environnement Zabbix
 
 * Ouvrir un terminal et exécuter `docker -v`. Vérifier que le service Docker est bien démarré
-* Démarrer les containers en vous positionnant dans le répertoire précédent pour exécuter 
+* Assurez-vous qu'il n'y ait aucun containers qui tourne. La commande ne doit rien renvoyer. 
+  ``` bash
+  docker ps
+  ```
+* Si des containers sont démarrés, on stoppe les anciens containers éventuels
+  ``` bash
+  docker stop $(docker ps -a -q)
+  ```
+* Nettoyage des anciens containers sur les PC. ⚠️ Attention sur vos machines perso
+  ``` bash
+  docker system prune
+  ```
+* Démarrer les containers Zabbix en vous positionnant dans le répertoire précédent pour exécuter 
 
     ``` bash
     docker compose -f docker-compose.zab.yaml up -d
