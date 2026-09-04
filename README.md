@@ -570,5 +570,5 @@ apt install procps
 
 * Nettoyage des containers à la fin du TP
 ``` bash
-docler system prune
+docker system prune
 ```
