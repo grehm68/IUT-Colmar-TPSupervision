@@ -36,7 +36,7 @@ Vous devez fournir un rapport au format **PDF** (uniquement!) nommé de la sorte
 |Question | Réponse (à ajouter) |
 |:--------|:--------:|
 |Liste des containers Zabbix démarrés avec la commande `docker ps` | |
-|Screenshot de la 1ère connexion à Zabbix |                          |
+|Screenshot de la 1ère connexion à Zabbix (après logon) ||
 |Résultat du ping depuis le serveur vers l'agent avec `zabbix_get`||
 |Screenshot de la découverte du réseau zabbix ||
 |Screenshot de 3 hôtes monitorés Monitoring / Hosts (avec le status Availability non grisé) ||
