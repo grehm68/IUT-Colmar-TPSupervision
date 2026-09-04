@@ -31,7 +31,7 @@ Ce rapport contiendra 2 parties :
 
 Vous devez fournir un rapport au format **PDF** (uniquement!) nommé de la sorte **NOM-Prénom-Rapport-Zabbix.pdf**
 
-### Tableau récapitulatif (à intégrer directement au rapport en 1ère page)
+### Tableau récapitulatif (à intégrer directement au rapport en 1ère page AVEC LES RÉPONSES)
 
 |Question | Réponse (à ajouter) |
 |:--------|:--------:|
