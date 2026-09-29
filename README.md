@@ -400,8 +400,7 @@ C'est l'erreur classique des débutants. Si vous configurez l'agent en actif mai
   * Afficher un graph sur les interfaces
 
 > [!TIP]
-> Configurer le daemon SNMP sur les 2 hôtes (router et switch) pour indiquer dans "System contact details" votre nom+prénom
-> Ajouter le screenshot du changement de valeur dans votre rapport en passant par Monitoring / Latest Data
+> Configurer le daemon SNMP sur les 2 hôtes (router et switch) pour indiquer dans "System contact details" votre nom+prénom. Ajouter le screenshot du changement de valeur dans votre rapport en passant par Monitoring / Latest Data
 
 ## Monitoring Web
 On peut facilement faire du monitoring de site web via `Web scenarios`
