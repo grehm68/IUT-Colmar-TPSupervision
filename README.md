@@ -216,6 +216,9 @@ Résultat attendu :
 
 Vous devez avoir des graphiques après quelques secondes
 
+* Visualisation des data : Monitoring / Hosts / zbx-agent / Lastest Data
+
+  Vous verrez toutes les data qui reviennent depuis l'agent. Attendre quelques minutes pour qu'il y en ait plusieurs
 
 ## Discovery
 > **_NOTE:_** On va utiliser la fonction de découverte Zabbix pour faire une découverte de l'infrastructure zabbix + des services.
