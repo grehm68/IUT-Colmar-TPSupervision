@@ -532,9 +532,18 @@ Utilisez les hotes router et switch pour faire des visualisation de réseaux
 
  ![alt text](src/enable-trigger-action-admin.png)
 
+ ## Envoi de données avec zabbix-trapper
+ * Pour l'hôte nginx, créer un item de type `Zabbix trapper`
+ * Définir une clé, par ex : `Temperature-salle`
+ * Type of information `text`
+
+ * Depuis l'hôte nginx, en bash, envoyez les données
+ * `zabbix_sender -z "zbx-server" -p 10051 -s "nginx" -k Temperature-salle -o '{"status":"OK","Temp":23.5,"Unit":"Degré"}'`
+ * Il faut installer le package zabbix-sender au préalable `apt install zabbix-sender`
+
  ## Idées pour aller plus loin
 * UserParameter, créer ses propres datas
-* Scan de vuln avec trivy
+* Utiliser un scan de vulnérabilité sur juice-shop et remonter le nombre de vulnérabilité dans Zabbix
 
 ## TIPS
 
