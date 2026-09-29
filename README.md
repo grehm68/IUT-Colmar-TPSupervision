@@ -356,7 +356,8 @@ ForceActiveChecksOnStart=1
 zabbix_agent2 --print 
 ```
 ✅ On doit avoir des datas
-> [!TIP] Que constatez-vous ?
+> [!TIP]
+> Que constatez-vous ?
 
 #### 2\. Côté Interface Web (Templates)
 
