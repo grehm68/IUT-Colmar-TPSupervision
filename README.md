@@ -223,7 +223,7 @@ Vous devez avoir des graphiques après quelques secondes
 ## Discovery
 > **_NOTE:_** On va utiliser la fonction de découverte Zabbix pour faire une découverte de l'infrastructure zabbix + des services.
 
-* Utiliser les commandes docker pour récuperer l'adresse du réseau utilisé par les containers.
+* Utiliser les commandes docker pour récupérer l'adresse du réseau utilisé par les containers.
 ``` bash
   docker network ls
   docker network inspect {name}
