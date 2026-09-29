@@ -200,7 +200,7 @@ zabbix_get -s <IP_de_l_agent> -k agent.version
 Résultat attendu :
 
 ```
-7.4.x (7.4.5)
+7.4.x
 ```
 
 ## Ajout Agent (version 1)
