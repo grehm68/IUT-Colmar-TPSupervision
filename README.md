@@ -229,7 +229,7 @@ Vous devez avoir des graphiques après quelques secondes
   docker network inspect {name}
 ```
 
-* Aller dans le menu Discovery et renseigner au point 5 l'adresse de votre réseau zabbix
+* Aller dans le menu Data Collection / Discovery et renseigner au point 5 l'adresse de votre réseau zabbix
 * Au point 7 renseigner les ports 
 > [!TIP]
 > On peut utiliser ICMP pour faire la découverte
