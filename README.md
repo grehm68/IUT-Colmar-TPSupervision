@@ -357,7 +357,7 @@ zabbix_agent2 --print
 ```
 ✅ On doit avoir des datas
 > [!TIP]
-> Que constatez-vous ?
+> Que constatez-vous ? (au niveau des datas et dans Monitoring / Discovery) ?
 
 #### 2\. Côté Interface Web (Templates)
 
